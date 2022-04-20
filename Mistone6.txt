@@ -1,0 +1,481 @@
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MsProject6.Model
+{
+    public class Employee
+    {
+        public int EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
+        public string Department { get; set; }
+        public string DateOfJoining { get; set; }
+        public string PhotoFileName { get; set; }
+    }
+}
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MsProject6.Model
+{
+    public class EmployeeContext : DbContext
+    {
+        public EmployeeContext(DbContextOptions<EmployeeContext> options) : base(options)
+        {
+
+        }
+        public DbSet<Employee> Employee { get; set; }
+        
+    }
+}
+
+
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MsProject6
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
+    }
+}
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using MsProject6.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MsProject6
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllers();
+            services.AddDbContext<EmployeeContext>(options =>
+options.UseSqlServer(Configuration.GetConnectionString("Dbcs")));
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseRouting();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+        }
+    }
+}
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MsProject6.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace MsProject6.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class EmployeeController : ControllerBase
+    {
+        private readonly EmployeeContext _context;
+        public EmployeeController(EmployeeContext context)
+        {
+            _context = context;
+        }
+        // GET: api/<EmployeeController>
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployee()
+        {
+            return await _context.Employee.ToListAsync();
+
+        }
+
+        // GET api/<EmployeeController>/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Employee>> GetEmployee(int id)
+        {
+            var emp = await _context.Employee.FindAsync(id);
+            if (emp == null)
+            {
+                return NotFound();
+            }
+            return emp;
+        }
+
+        // POST api/<EmployeeController>
+        [HttpPost]
+        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
+        {
+            _context.Employee.Add(employee);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction("GetEmployee", new { id = employee.EmployeeId }, employee);
+
+        }
+
+        // PUT api/<EmployeeController>/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutEmployee(int id, Employee employee)
+        {
+            if (id != employee.EmployeeId)
+            {
+                return BadRequest();
+            }
+            _context.Entry(employee).State = EntityState.Modified;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!EmployeeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return NoContent();
+        }
+
+        private bool EmployeeExists(int id)
+        {
+            return _context.Employee.Any(e => e.EmployeeId == id);
+        }
+
+        // DELETE api/<EmployeeController>/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Employee>> DeleteEmployee(int id)
+        {
+            var emp = await _context.Employee.FindAsync(id);
+            if (emp == null)
+            {
+                return NotFound();
+
+            }
+            _context.Employee.Remove(emp);
+            await _context.SaveChangesAsync();
+            return emp;
+        }
+    }
+}
+
+
+Install GIT on your local machine (Windows preferably)
+
+
+Create a Git working directory on your local machine.
+
+Create a new GIT repository on GitHub.
+
+Map the Working Directory to the remote repo
+
+Install Notepad++ for further code operations"
+
+
+git branch -m new_branch_name
+
+git branch -m old_branch_name new_branch_name
+
+
+git push origin :old_remote_branch_name new_local_branch_name
+
+git push origin :old_remote_branch_name new_local_branch_name
+git checkout branch4
+git branch -d branch4
+git push origin --delete branch4
+
+
+
+$ mate file1.txt //new file is created
+$ mate file2.txt // new file created
+$ git mv file1.txt project
+$ git commit “file is saved”
+$ git status
+$ git push remote repo
+$ git mv file2.txt project
+$ git commit “file is saved”
+$ git status
+$ git push remote repo
+$ mate file1.txt file2.txt file3.txt
+$ git mv file1.txt file2.txt file3.txt local repo
+$ git commit “ three files are commited”
+$ git status
+$ git push file1.txt file2.txt file3.txt remote repo
+$ git status
+
+
+Steps to create CI/CD pipeline
+
+Create Your Azure DevOps Organization
+The first step is to navigate to https://dev.azure.com and sign-in to Azure DevOps. You need to create at least an organization to store your projects, your repositories.
+
+
+Create a Project
+Please create an Azure DevOps project by selecting values like visibility, source control etc.
+
+
+Create a Build Pipeline
+
+I have created a sample .net core app and its running on my machine. Now I want to set up a CI-CD pipeline for this application using Azure DevOps. Please select build option from pipeline menu to set up build pipeline.
+
+
+Now choose a build template provided by Azure DevOps.
+
+I can also select the TFVC version control system or GitHub if I want to as source code. Now give a name to build definition. Please select an appropriate solution file to build & location to save build artifacts. These artifacts will be used as input to release pipeline. You can see which artifacts. Azure DevOps provides multiple predefined templates to build application developed in java, node.js, Php etc
+
+Create a Release Pipeline
+Now once build succeeded, we need to create release definition. You can select release menu from the pipeline or click on the release button as shown below. When you get into the release pipeline screen, you’ll need to select a template.
+Azure DevOps has provided a lot of predefined templates for deployment. Some of them are as follows
+
+Azure App Service Deployment with Test and without Test
+
+Azure App Service Deployment with continuous monitoring
+
+Cloud Service Deployment
+
+On-Premise deployment
+
+Azure VM Scale Set
+
+Service Fabric (Stateful/ stateless)
+
+Azure Policy deployment
+
+Function App to Azure
+
+We can create our own custom template as well as per our requirement.
+After selecting the template, we can add task so that we can deploy a build multiple environments like dev, test, UAT etc. We can add particular use as a release approver as well. We can set the variable values which are used in the release definition. You can convert those templates to YAML in a later stage as well and then check in version control if you want. You see that there are all kinds of pre-defined templates to do your builds. So for example, a Gradle build or a Go build, or you want to do some load testing, or you want to do Xamarin app for iOS, Ant builds, you name it; it's all there and part of the out-of-the-box experience. Azure DevOps has things like NuGet restore, Test Assemblies, Build the solution, all kinds of things that we can pick from the task picker.
+After saving the release definition, you can create a new release. You can choose environments for release if you have added multiple release tasks.
+After creating a release, we can track release progress as shown below.
+We can enable pre-deployment approvals as shown below. Now, what happens when I did a deployment and the deployment failed? Well, I can select to re-deploy the previous well-known stable deployment so I'm always in a good state again, which is quite handy. So that's a way we can define those post approvals before we move to the next phase in our deployment.
+Pipeline History
+We can also look at the history where we can track the changes that are made to the release definition, which is also very handy if it comes to compliance and security. Now we can clone those different environments, because after and you want to do the same in let's say dev, as in staging as in test or production. We have different triggers here and one of the triggers is that we wanted to have continuous integration. So every time, changes in our Git repo, I want to trigger build/Release pipeline. We can also schedule things in Azure DevOps.
+After successful completion of a release pipeline, you can visit the deployed version of your application.
+
+
+
+
+At the command line, type MSBuild.exe <SolutionName>.sln, where <SolutionName> corresponds to the file name of the solution that contains the target that you want to execute
+msbuild SlnFolders.sln -target:NotInSlnfolder:Rebuild;NewFolder\InSolutionFolder:Clean
+
+Open the Command Window. ...
+From the command window, navigate to the folder containing the project file, in this case, D:\BuildApp\MyApp.
+Run msbuild with the command switch -t:HelloWorld . ...
+Examine the output in the Command window.
+
+using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
+namespace MsLogin.Model
+{
+    public class ApplicationUser : IdentityUser
+    {
+        [Column(TypeName = "nvarchar(150)")]
+        public string FullName { get; set; }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MsLogin.Model
+{
+    public class ApplicationUserModel
+    {
+        public string UserName { get; set; }
+        public string MobileNo { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string FullName { get; set; }
+    }
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
+namespace MsLogin.Model
+{
+    public class AuthenticationContext : IdentityDbContext
+    {
+        public AuthenticationContext(DbContextOptions options) : base(options)
+        {
+
+        }
+
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+    }
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MsLogin.Model
+{
+    public class RentModule
+    {
+        public int RentId { get; set; }
+        public string Choice { get; set; }
+        public string City { get; set; }
+        public int Budget { get; set; }
+        public int Sq { get; set; }
+        public int Feet { get; set; }
+        public string LandMark { get; set; }
+
+    }
+}
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using MsLogin.Model;
+
+namespace MsLogin.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ApplicationUserController : ControllerBase
+    {
+        private UserManager<ApplicationUser> _userManager;
+        private SignInManager<ApplicationUser> _singInManager;
+
+        public ApplicationUserController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        {
+            _userManager = userManager;
+            _singInManager = signInManager;
+        }
+
+        [HttpPost]
+        [Route("Register")]
+        //POST : /api/ApplicationUser/Register
+        public async Task<Object> PostApplicationUser(ApplicationUserModel model)
+        {
+            var applicationUser = new ApplicationUser()
+            {
+                UserName = model.UserName,
+                Email = model.Email,
+                FullName = model.FullName
+            };
+
+            try
+            {
+                var result = await _userManager.CreateAsync(applicationUser, model.Password);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+    }
+}
+
+namespace MsProject  
+{  
+    [TestClass]  
+    public class UnitTest1  
+    {  
+        [TestMethod]  
+        public void TestMethod1()  
+        {  
+              
+        }  
+    }  
+} 
+
+
+namespace MsProject  
+{  
+    [TestClass]  
+    public class UnitTest1  
+    {  
+        [TestMethod]  
+        public void TestMethod1()  
+        {  
+            EmployeeController home = new EmployeeController();  
+            string result = home.GetEmployeeName(1);  
+            Assert.AreEqual(result, "Jignesh");  
+        }  
+    }  
+}
+
+ [TestClass]  
+    public class UnitTest2  
+    {  
+        [DataTestMethod]  
+        [DataRow(1, "Jignesh")]  
+        [DataRow(2, "Rakesh")]  
+        [DataRow(3, "Not Found")]  
+        public void TestMethod1(int empId, string name)  
+        {  
+            EmployeeController home = new EmployeeController();    
+            string result = home.GetEmployeeName(empId);  
+            Assert.AreEqual(result, name);  
+        }  
+    }
